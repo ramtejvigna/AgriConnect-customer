@@ -1,25 +1,30 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, ChevronDown, Filter, Search } from 'lucide-react';
-
-const dummyCrops = [
-  { id: 1, name: 'Tomatoes', farmer: 'John Doe', location: 'California', price: 2.99, quantity: 100, image: 'https://placehold.co/400x300' },
-  { id: 2, name: 'Potatoes', farmer: 'Jane Smith', location: 'Idaho', price: 1.99, quantity: 200, image: 'https://placehold.co/400x300' },
-  { id: 3, name: 'Carrots', farmer: 'Bob Johnson', location: 'Oregon', price: 1.49, quantity: 150, image: 'https://placehold.co/400x300' },
-  { id: 4, name: 'Lettuce', farmer: 'Alice Brown', location: 'Arizona', price: 0.99, quantity: 120, image: 'https://placehold.co/400x300' },
-  { id: 5, name: 'Apples', farmer: 'Charlie Wilson', location: 'Washington', price: 3.49, quantity: 80, image: 'https://placehold.co/400x300' },
-  { id: 6, name: 'Strawberries', farmer: 'Eva Davis', location: 'Florida', price: 4.99, quantity: 60, image: 'https://placehold.co/400x300' },
-];
+import axios from 'axios';
 
 const BuyCrops = () => {
-  const [crops] = useState(dummyCrops);
+  const [crops, setCrops] = useState([]);
   const [sortBy, setSortBy] = useState('name');
   const [filterQuery, setFilterQuery] = useState('');
   const [showFilters, setShowFilters] = useState(false);
   const [selectedCrop, setSelectedCrop] = useState(null);
 
+  useEffect(() => {
+    const fetchCrops = async () => {
+      try {
+        const response = await axios.get('http://localhost:5000/customers/available');
+        setCrops(response.data);
+      } catch (error) {
+        console.error('Error fetching crops:', error);
+      }
+    };
+
+    fetchCrops();
+  }, []);
+
   const sortedAndFilteredCrops = crops
-    .filter(crop => 
+    .filter(crop =>
       crop.name.toLowerCase().includes(filterQuery.toLowerCase()) ||
       crop.farmer.toLowerCase().includes(filterQuery.toLowerCase()) ||
       crop.location.toLowerCase().includes(filterQuery.toLowerCase())
